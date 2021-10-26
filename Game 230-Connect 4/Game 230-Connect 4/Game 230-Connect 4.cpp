@@ -1,6 +1,6 @@
 #include <iostream>
 #include <stdlib.h>
-//#include "main.h"
+#include "time.h"
 using namespace std;
 
 int numberOfRows = 7;
@@ -354,7 +354,7 @@ bool FindWinner(int** array, int whoseTurnItIs)
 
 }
 
-bool AI(int** array, int whoseTurnItIs) {
+int** AI(int** array) {
     int playerCount = 0;
     int aiCount = 0;
 
@@ -372,14 +372,15 @@ bool AI(int** array, int whoseTurnItIs) {
 
             if (playerCount == winCondition - 1)
             {
-                if (array[j + 1][i] == 0)
+                if ((array[j + 1][i] == 0) && j + 1 < numberOfColumns)
                 {
                     array[j + 1][i] = 2;
                     return array;
                 }
-                else if (array[j - 2][i] == 0)
+                else if ((array[j - 2][i] == 0) && j - 2 >= 0)
                 {
                     array[j - 2][i] = 2;
+                    return array;
                 }
             }
 
@@ -392,30 +393,28 @@ bool AI(int** array, int whoseTurnItIs) {
             }
 
             if (aiCount == winCondition - 1) {
-                if (array[j + 1][i] == 0)
+                if ((array[j + 1][i] == 0) && j + 1 < numberOfColumns)
                 {
                     array[j + 1][i] = 2;
                     return array;
                 }
-                else if (array[j - 2][i] == 0)
+                else if ((array[j - 2][i] == 0) && j - 2 >= 0)
                 {
                     array[j - 2][i] = 2;
+                    return array;
                 }
-                else
-                {
-                    int value = rand() % numberOfColumns;
-                    InsertElement(array, value, whoseTurnItIs);
-                }
+                
             }
         }
         playerCount = 0;
+        aiCount = 0;
     }
 
     //Check Win Condition For Vertical Direction////////////////
     for (int i = 0; i < numberOfColumns; i++)
     {
         for (int j = 0; j < numberOfRows; j++) {
-            if (array[i][j] == whoseTurnItIs) {
+            if (array[i][j] == 2) {
                 playerCount++;
             }
             else
@@ -423,13 +422,52 @@ bool AI(int** array, int whoseTurnItIs) {
                 playerCount = 0;
             }
 
-            if (playerCount == winCondition)
+            if (playerCount == winCondition - 1)
             {
-                return WinnerFoundShallWeRestartGame(true, whoseTurnItIs);
+                if ((array[i + 1][j] == 0) && i + 1 < numberOfRows)
+                {
+                    array[i + 1][j] = 2;
+                    return array;
+                }
+                else if ((array[i - 2][j] == 0) && i - 2 >= 0)
+                {
+                    array[j - 2][i] = 2;
+                    return array;
+                }
             }
+
+            if (array[i][j] == 2) {
+                aiCount++;
+            }
+            else
+            {
+                aiCount = 0;
+            }
+
+            if (aiCount == winCondition - 1) {
+                if ((array[i + 1][j] == 0) && i + 1 < numberOfRows)
+                {
+                    array[i + 1][j] = 2;
+                    return array;
+                }
+                else if ((array[i - 2][j] == 0) && i - 2 >= 0)
+                {
+                    array[i - 2][j] = 2;
+                    return array;
+                }
+
+            }
+            
         }
         playerCount = 0;
+        aiCount = 0;
     }
+            
+            srand(time(0));
+            int value = rand() % numberOfColumns;
+            array = InsertElement(array, value, 2); \
+            return array;
+            
 }
 
 
@@ -441,14 +479,17 @@ int main()
     int whoseTurnItIs = 1;
     bool playerEnteredAllTheInputs = false;
 
+    cout << "WELCOME TO CONNECT (INSERT NUMBER) PROJECT \n\n\n";
     while (!playerEnteredAllTheInputs)
     {
-        /*cout << "Do you want to enable AI function? Press 1 to select YES, 0 to select NO\n";
+        cout << "Do you want to enable AI function? Press 1 to select YES, 0 to select NO\n";
         cin >> enableAi;
         if (enableAi != 0 && enableAi != 1) {
             cout << "Please enter a valid number\n";
             continue;
         }
+
+        cout << "You have selected to play with AI. You will play in a 7 x 6 grid with win condition as 4\n ";
 
         if (enableAi == 1) {
             numberOfColumns = 6;
@@ -456,7 +497,11 @@ int main()
             winCondition = 4;
             playerEnteredAllTheInputs = true;
             break;
-        }*/
+        }
+
+       
+
+
 
         cout << "Enter the number of columns. Make sure the value is between 4 and 20 \n";
         cin >> numberOfColumns;
@@ -491,6 +536,7 @@ int main()
             continue;
         }
         playerEnteredAllTheInputs = true;
+
     }
 
 
@@ -498,10 +544,112 @@ int main()
 
     DisplayElementsInArray(connect4Board);
 
+#pragma region  WithAI
+    if (enableAi == 1) {
+        while (!gameHasEnded)
+        {
+            if (enableAi == 1)
+            {
+                cout << "\nPlayer " << whoseTurnItIs << " Please select the column where you want to insert the element\n";
+                cin >> getColumnNumber;
+                if (getColumnNumber < 0 || getColumnNumber >= numberOfColumns)
+                {
+                    cout << "\nPlease Enter a valid number\n";
+                    continue;
+                }
+                connect4Board = InsertElement(connect4Board, getColumnNumber, 1);
+            }
+
+            if (!playerTurnHasEnded) continue;  //Checking if player entered correct column number
+            DisplayElementsInArray(connect4Board);
+
+
+
+            numberOfTurns++;
+            if (numberOfTurns >= winCondition * 2 - 1)
+            {
+                //Check Win
+                bool isWinner = FindWinner(connect4Board, whoseTurnItIs);
+
+                //Draw Condition
+                if (numberOfTurns == numberOfColumns * numberOfRows)
+                {
+                    cout << "Game has tied. Do you want to restart the game? Enter 1 to restart and 0 to end the game \n ";
+                    cin >> restartValue;
+                    if (restartValue > 0)
+                    {
+                        restartValue = 0;
+                        numberOfTurns = 0;
+                        connect4Board = InitialiseArrayWithZeroes();
+                        DisplayElementsInArray(connect4Board);
+                        playerTurnHasEnded = true;
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                }
+
+            }
+
+            cout << "\nEnemy AI had played their turn\n";
+            connect4Board = AI(connect4Board);
+            DisplayElementsInArray(connect4Board);
+
+
+            numberOfTurns++;
+            if (numberOfTurns >= winCondition * 2 - 1)
+            {
+                //Check Win
+                bool isWinner = FindWinner(connect4Board, whoseTurnItIs);
+
+                //Draw Condition
+                if (numberOfTurns == numberOfColumns * numberOfRows)
+                {
+                    cout << "Game has tied. Do you want to restart the game? Enter 1 to restart and 0 to end the game \n ";
+                    cin >> restartValue;
+                    if (restartValue > 0)
+                    {
+                        restartValue = 0;
+                        numberOfTurns = 0;
+                        connect4Board = InitialiseArrayWithZeroes();
+                        DisplayElementsInArray(connect4Board);
+                        playerTurnHasEnded = true;
+                        continue;
+                    }
+                    else
+                    {
+                        break;
+                    }
+
+                }
+
+            }
+
+            //If Match is to be restarted
+            if (restartValue > 0)
+            {
+                restartValue = 0;
+                connect4Board = InitialiseArrayWithZeroes();
+                DisplayElementsInArray(connect4Board);
+                playerTurnHasEnded = true;
+                continue;
+            }
+
+        }
+    }
+    
+#pragma endregion
+
+
+#pragma region WithoutAI
+    else {
+
+
     while (!gameHasEnded)
     {
-
-
 
         if (enableRemoveFunction == 1) //Remove Enabled
         {
@@ -597,5 +745,10 @@ int main()
         ChangePlayerTurn(whoseTurnItIs);
         playerTurnHasEnded = true;
     }
+#pragma endregion
+
+    }
+
+        
 
 }
