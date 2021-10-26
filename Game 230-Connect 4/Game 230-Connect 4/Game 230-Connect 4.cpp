@@ -18,7 +18,7 @@ int enableRemoveFunction = 0;
 int enableAi = 0;
 
 int** InitialiseArrayWithZeroes() {
-    cout << "Initialising with Zeroes\n\n";
+    cout <<"Initialising with Zeroes\n\n";
     int** array = new int* [numberOfColumns];
     for (int i = 0; i < numberOfColumns; i++) {
         array[i] = new int[numberOfRows];
@@ -374,12 +374,12 @@ int** AI(int** array) {
             {
                 if ((array[j + 1][i] == 0) && j + 1 < numberOfColumns)
                 {
-                    array[j + 1][i] = 2;
+                    array = InsertElement(array, j + 1, 2);
                     return array;
                 }
                 else if ((array[j - 2][i] == 0) && j - 2 >= 0)
                 {
-                    array[j - 2][i] = 2;
+                    array = InsertElement(array, j - 2, 2);
                     return array;
                 }
             }
@@ -395,12 +395,12 @@ int** AI(int** array) {
             if (aiCount == winCondition - 1) {
                 if ((array[j + 1][i] == 0) && j + 1 < numberOfColumns)
                 {
-                    array[j + 1][i] = 2;
+                    array = InsertElement(array, j + 1, 2);
                     return array;
                 }
                 else if ((array[j - 2][i] == 0) && j - 2 >= 0)
                 {
-                    array[j - 2][i] = 2;
+                    array = InsertElement(array, j - 2, 2);
                     return array;
                 }
                 
@@ -414,7 +414,7 @@ int** AI(int** array) {
     for (int i = 0; i < numberOfColumns; i++)
     {
         for (int j = 0; j < numberOfRows; j++) {
-            if (array[i][j] == 2) {
+            if (array[i][j] == 1) {
                 playerCount++;
             }
             else
@@ -424,16 +424,11 @@ int** AI(int** array) {
 
             if (playerCount == winCondition - 1)
             {
-                if ((array[i + 1][j] == 0) && i + 1 < numberOfRows)
+                if ((array[i][j - 2] == 0) && j - 2 >= 0)
                 {
-                    array[i + 1][j] = 2;
+                    array = InsertElement(array, i, 2);
                     return array;
-                }
-                else if ((array[i - 2][j] == 0) && i - 2 >= 0)
-                {
-                    array[j - 2][i] = 2;
-                    return array;
-                }
+                }               
             }
 
             if (array[i][j] == 2) {
@@ -445,14 +440,9 @@ int** AI(int** array) {
             }
 
             if (aiCount == winCondition - 1) {
-                if ((array[i + 1][j] == 0) && i + 1 < numberOfRows)
+                if ((array[i][j - 2] == 0) && j - 2 >= 0)
                 {
-                    array[i + 1][j] = 2;
-                    return array;
-                }
-                else if ((array[i - 2][j] == 0) && i - 2 >= 0)
-                {
-                    array[i - 2][j] = 2;
+                    array = InsertElement(array, i, 2);
                     return array;
                 }
 
@@ -489,12 +479,12 @@ int main()
             continue;
         }
 
-        cout << "You have selected to play with AI. You will play in a 7 x 6 grid with win condition as 4\n ";
+        cout << "You have selected to play with AI. You will play in a 7 x 6 grid with win condition as 3\n\n";
 
         if (enableAi == 1) {
             numberOfColumns = 6;
             numberOfRows = 7;
-            winCondition = 4;
+            winCondition = 3;
             playerEnteredAllTheInputs = true;
             break;
         }
